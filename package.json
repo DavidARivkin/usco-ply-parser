@@ -1,0 +1,19 @@
+{
+  "name": "usco-ply-parser",
+  "version": "0.0.1",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/usco/usco-ply-parser.git"
+  },
+  "main": "PLYParser.js",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "jasmine-node": "",
+    "three": ""
+  },
+  "scripts": {
+    "test": "jasmine-node specs/"
+  }
+}

@@ -1,5 +1,5 @@
-PLYParser = require("../PLYParser");
 THREE = require("three");
+PLYParser = require("../PLYParser");
 fs = require("fs");
 
 describe("PLY parser tests", function() {

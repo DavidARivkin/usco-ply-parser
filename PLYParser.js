@@ -17,9 +17,7 @@
  *	loader.load( './models/ply/ascii/dolphins.ply' );
  */
 
-var isNode = typeof global !== "undefined" && {}.toString.call(global) == '[object global]';
-
-if(isNode) THREE = require( 'three' ); 
+var detectEnv = require("composite-detect");
 
 THREE.PLYParser = function () {
   this.outputs = ["geometry"]; //to be able to auto determine data type(s) fetched by parser
@@ -412,4 +410,4 @@ THREE.PLYParser.prototype = {
 
 //THREE.EventDispatcher.prototype.apply( THREE.PLYParser.prototype );
 
-if (isNode) module.exports = THREE.PLYParser;
+if (detectEnv.isModule) module.exports = THREE.PLYParser;

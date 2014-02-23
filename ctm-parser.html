@@ -1,0 +1,20 @@
+<link rel="import" href="../polymer/polymer.html">
+<script src="lib/ply-parser.js"></script>
+
+<polymer-element name="ply-parser" extends="usco-parser-base">
+  <script>
+    Polymer("ply-parser",{
+      parser : null,
+      created:function()
+      { 
+        AMFParser = require( "ply-parser" );
+        this.parser = new AMFParser();
+      },
+      //public api
+      parse:function( rawData )
+      {
+        return this.parser.parse( rawData );
+      } 
+    });
+  </script>
+</polymer>

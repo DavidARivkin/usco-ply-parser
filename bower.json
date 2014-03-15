@@ -5,6 +5,7 @@
   "dependencies": {
   },
   "ignore": [
-    "specs/"
+    "specs/",
+    "./ply-parser.js"
   ]
 }

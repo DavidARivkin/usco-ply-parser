@@ -8,6 +8,7 @@ module.exports = (grunt) ->
         src: ["./ply-parser.js"]
         dest: "lib/ply-parser.js"
         options:
+          transform: ["workerify"]
           external: ["composite-detect","three","q"]
           alias: ["./ply-parser.js:ply-parser"]
     bump:

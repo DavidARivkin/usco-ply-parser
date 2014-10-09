@@ -21,6 +21,7 @@ var detectEnv = require("composite-detect");
 
 if(detectEnv.isNode) var THREE = require("three");
 if(detectEnv.isBrowser) var THREE = window.THREE;
+if(detectEnv.isModule) var Q = require('q');
 
 
 PLYParser = function () {
@@ -51,20 +52,36 @@ PLYParser.prototype = {
 
 	},
 
-	parse: function ( data ) {
+	parse: function ( data, parameters ) {
 
+    var parameters = parameters || {};
+    var useBuffers = parameters.useBuffers !== undefined ? parameters.useBuffers : true;
+    var useWorker = parameters.useWorker !== undefined ?  parameters.useWorker && detectEnv.isBrowser: true;
+  
+    var deferred = Q.defer();
+		
 		if ( data instanceof ArrayBuffer ) {
 
-			return this.isASCII( data )
-				? this.parseASCII( this.bin2str( data ) )
-				: this.parseBinary( data );
+      var isASCII = this.isASCII( data );
+      if(isASCII)
+      {
+        deferred.resolve( this.parseASCII( this.bin2str( data ) ) );
+      }
+      else
+      {
+        deferred.resolve( this.parseBinary( data ) );
+      }
 
 		} else {
-
-			return this.parseASCII( data );
-
+		  var geometry = this.parseASCII( data );
+		  geometry.computeBoundingBox();
+	    geometry.computeBoundingSphere();
+	    geometry.computeVertexNormals();
+	    geometry.computeFaceNormals();
+      deferred.resolve( geometry  );
 		}
-
+    
+    return deferred;
 	},
 
 	parseHeader: function ( data ) {
@@ -283,12 +300,7 @@ PLYParser.prototype = {
 			geometry.elementsNeedUpdate = true;
 			
 		}
-
-		geometry.computeCentroids();
-		geometry.computeBoundingSphere();
-
 		return geometry;
-		
 	},
 
 	handleElement: function ( geometry, elementName, element ) {
@@ -408,6 +420,53 @@ PLYParser.prototype = {
 		
 		return this.postProcess( geometry );
 		
+	},
+	
+	parseBinaryBuffers: function ( data ) {
+	
+	  var geometry = new THREE.BufferGeometry();
+
+		var header = this.parseHeader( this.bin2str( data ) );
+		var little_endian = (header.format === "binary_little_endian");
+		var body = new DataView( data, header.headerLength );
+		var result, loc = 0;
+
+		for ( var currentElement = 0; currentElement < header.elements.length; currentElement ++ ) {
+			
+			for ( var currentElementCount = 0; currentElementCount < header.elements[currentElement].count; currentElementCount ++ ) {
+			
+				result = this.binaryReadElement( body, loc, header.elements[currentElement].properties, little_endian );
+				loc += result[1];
+				var element = result[0];
+			
+				//this.handleElement( geometry, header.elements[currentElement].name, element );
+			  
+			  if ( elementName === "vertex" ) {
+
+			      geometry.vertices.push(
+				      new THREE.Vector3( element.x, element.y, element.z )
+			      );
+			
+			      if ( 'red' in element && 'green' in element && 'blue' in element ) {
+				
+				      geometry.useColor = true;
+				
+				      color = new THREE.Color();
+				      color.setRGB( element.red / 255.0, element.green / 255.0, element.blue / 255.0 );
+				      geometry.colors.push( color );
+				
+			      }
+
+		      } else if ( elementName === "face" ) {
+
+			      geometry.faces.push(
+				      new THREE.Face3( element.vertex_indices[0], element.vertex_indices[1], element.vertex_indices[2] )
+			      );
+
+		      }
+			  
+			}
+	}
 	}
 
 };

@@ -8,6 +8,7 @@
   },
   "main": "ply-parser.js",
   "dependencies": {
+    "q": "~0.9.7",
     "three-js": "git://github.com/usco/three.js.git",
     "composite-detect": "0.0.3"
   },

@@ -10,17 +10,17 @@
   "dependencies": {
     "q": "~0.9.7",
     "three-js": "git://github.com/usco/three.js.git",
-    "composite-detect": "0.0.3",
-    "source-map": "^0.1.40",
-    "inline-source-map": "^0.3.0",
-    "convert-source-map": "^0.4.1"
+    "composite-detect": "0.0.3"
   },
   "devDependencies": {
     "jasmine-node": "",
     "grunt": "~0.4.2",
     "grunt-browserify": "~1.2.12",
     "workerify": "git://github.com/shama/workerify",
-    "grunt-bump": "0.0.13"
+    "grunt-bump": "0.0.13",
+    "source-map": "^0.1.40",
+    "inline-source-map": "^0.3.0",
+    "convert-source-map": "^0.4.1"
   },
   "scripts": {
     "test": "jasmine-node specs/"

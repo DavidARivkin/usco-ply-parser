@@ -41,31 +41,36 @@ PLYParser.prototype.parse = function ( data, parameters ) {
 
   var parameters = parameters || {};
   var useBuffers = parameters.useBuffers !== undefined ? parameters.useBuffers : true;
-  var useWorker = parameters.useWorker !== undefined ?  parameters.useWorker && detectEnv.isBrowser: true;
+  var useWorker  = parameters.useWorker !== undefined ?  parameters.useWorker && detectEnv.isBrowser: true ;
+  var rawBuffers = parameters.rawBuffers !== undefined ? parameters.rawBuffers : false;
 
   var deferred = Q.defer();
   var self = this;
   
-  /*function onDataLoaded( data )
+  function postProcess( data )
   {
-      for(var i=0;i<data.objects.length;i++)
+      if(!rawBuffers){
+        data = self.createModelBuffers( data )
+      }else
       {
-        var modelData = data.objects[i];
-        var model = self.createModelBuffers( modelData );
-		    rootObject.add( model );
+        var output = {};
+        output.positions = data._attributes["position"];
+        output.colors    = data._attributes["color"];
+        output.indices   = data._attributes["indices"];
+        data = output;
       }
-  }*/
-  console.log("in ply parser");
+      return data 
+  }
   if ( useWorker ) {
     var worker = new Worker( "./ply-worker.js" );
 	  worker.onmessage = function( event ) {
       if("data" in event.data)
       {
         var data = event.data.data;
-        console.log("data recieved in main thread", data);
-        var model = self.createModelBuffers( data );
-        //onDataLoaded( data );
-        deferred.resolve( model );//rootObject );
+        //console.log("data recieved in main thread", data);
+        
+        data = postProcess( data );
+        deferred.resolve( data );
       }
       else if("progress" in event.data)
       {
@@ -80,9 +85,11 @@ PLYParser.prototype.parse = function ( data, parameters ) {
   }
   else
   {
-    data = new PLY().getData( data );
-    onDataLoaded( data );
-    deferred.resolve( rootObject );
+    var PLY = require("./ply");
+    data = new PLY().load( data );
+    
+    data = postProcess( data );
+    deferred.resolve( data );
   }
 
   return deferred;
@@ -92,7 +99,7 @@ PLYParser.prototype.parse = function ( data, parameters ) {
 
 //TODO: potential candidate for re-use across parsers
 PLYParser.prototype.createModelBuffers = function ( modelData ) {
-  console.log("creating model buffers",modelData, "faces",modelData.faceCount);
+  //console.log("creating model buffers",modelData, "faces",modelData.faceCount);
 
   //TODO: only deal with indices/faces if there are ANY !
   var faces = modelData.faceCount || modelData._attributes.position.length/3;
@@ -189,6 +196,5 @@ PLYParser.prototype.createModelBuffers = function ( modelData ) {
 	}
 
 };*/
-
 
 if (detectEnv.isModule) module.exports = PLYParser;

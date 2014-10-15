@@ -35,14 +35,7 @@ PLY.prototype.load = function( data ){
       }
 
 	} else {
-	  console.log("foo");
 	  return this.parseASCII( data );
-	  /*var geometry = this.parseASCII( data );
-	  geometry.computeBoundingBox();
-    geometry.computeBoundingSphere();
-    geometry.computeVertexNormals();
-    geometry.computeFaceNormals();
-    deferred.resolve( geometry  );*/
 	}
 
 }
@@ -154,9 +147,8 @@ PLY.prototype.parseHeader= function ( data ) {
 				
 
 			default:
-
 				console.log("unhandled", lineType, lineValues);
-				console.log(lineType);
+				//console.log(lineType);
 
 			}
 

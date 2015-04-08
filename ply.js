@@ -65,6 +65,7 @@ PLY.prototype.parseHeader= function ( data ) {
 		
 		var patternHeader = /ply([\s\S]*)end_header\n/;
 		var headerText = "";
+		var result;
 		if ( ( result = patternHeader.exec( data ) ) != null ) {
 			headerText = result [ 1 ];
 		}
@@ -186,7 +187,7 @@ PLY.prototype.parseASCIINumber= function ( n, type ) {
 
 	PLY.prototype.parseASCIIElement= function ( properties, line ) {
 
-		values = line.split( /\s+/ );
+		var values = line.split( /\s+/ );
 		
 		var element = Object();
 		
@@ -197,7 +198,7 @@ PLY.prototype.parseASCIINumber= function ( n, type ) {
 				var list = [];
 				var n = this.parseASCIINumber( values.shift(), properties[i].countType );
 
-				for ( j = 0; j < n; j ++ ) {
+				for (var j = 0; j < n; j ++ ) {
 					
 					list.push( this.parseASCIINumber( values.shift(), properties[i].itemType ) );
 					
@@ -262,9 +263,9 @@ PLY.prototype.parseASCIINumber= function ( n, type ) {
 
 		//return this.postProcess( geometry );
     return this.currentObject;
-	},
+	}
 
-	postProcess= function ( geometry ) {
+	var postProcess= function ( geometry ) {
 		
 		if ( geometry.useColor ) {
 			
@@ -406,7 +407,7 @@ PLY.prototype.parseASCIINumber= function ( n, type ) {
 			
 			for ( var currentElementCount = 0; currentElementCount < header.elements[currentElement].count; currentElementCount ++ ) {
 			
-				result = this.binaryReadElement( body, loc, header.elements[currentElement].properties, little_endian );
+				var result = this.binaryReadElement( body, loc, header.elements[currentElement].properties, little_endian );
 				loc += result[1];
 				var element = result[0];
 			

@@ -19,12 +19,12 @@
 
 var detectEnv = require("composite-detect");
 
-if(detectEnv.isNode) var THREE = require("three");
 if(detectEnv.isBrowser) var THREE = window.THREE;
+if(detectEnv.isModule && !THREE) var THREE = require("three");
 if(detectEnv.isModule) var Q = require('q');
 
 
-PLYParser = function () {
+var PLYParser = function () {
   this.outputs = ["geometry"]; //to be able to auto determine data type(s) fetched by parser
   
   this.defaultMaterialType = THREE.MeshPhongMaterial;//THREE.MeshLambertMaterial; //
@@ -47,7 +47,7 @@ PLYParser.prototype.parse = function ( data, parameters ) {
   var deferred = Q.defer();
   var self = this;
   
-  function postProcess( data )
+  var postProcess = function( data )
   {
       if(!rawBuffers){
         data = self.createModelBuffers( data )
@@ -62,7 +62,10 @@ PLYParser.prototype.parse = function ( data, parameters ) {
       return data 
   }
   if ( useWorker ) {
-    var worker = new Worker( "./ply-worker.js" );
+    //var worker = new Worker( "./ply-worker.js" );
+    var Worker = require("./ply-worker.js");//Webpack worker!
+    var worker = new Worker;
+
 	  worker.onmessage = function( event ) {
       if("data" in event.data)
       {

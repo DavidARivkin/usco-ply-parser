@@ -19,3 +19,7 @@ Type:
 
 This will generate the correct browser(ified) version of the source in the lib folder
 
+Usage with webpack
+------------------
+
+  just require / import the library (correctly points to ply-parser.js)
